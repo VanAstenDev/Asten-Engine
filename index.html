@@ -1,13 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Asten Engine</title>
+
+    <!-- //import Engine -->
+    <script src="engine/engine.js"></script>
+    <script src="engine/director.js"></script>
+    <script src="engine/sprite.js"></script>
+    <script src="engine/collider.js"></script>
+    <script src="engine/user-interface/interfacemanager.js"></script>
+    <script src="engine/user-interface/uiElement.js"></script>
 </head>
+
 <body>
-    <h1>Asten Engine</h1>
-    <p>An engine built for building games using plain JavaScript.</p>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        //setup engine
+        const engine = new Engine(innerWidth, innerHeight);
+        const ctx = engine.canvas.getContext("2d");
+
+        //create player character
+        let sprite = new Sprite(250, 250, 32, 32);
+        // let spriteTexture = new Image();
+        // spriteTexture.src = "./playersprite.png";
+        // spriteTexture.onload = () => {
+        //     sprite.setTexture(spriteTexture);
+        // }
+
+        let spriteTexture = new Image();
+        spriteTexture.src = "./playeranimation.png";
+        spriteTexture.onload = () => {
+            sprite.setTextureSheet(spriteTexture, 10);
+        }
+
+        sprite.vel = new Vector(Math.random() * 10, Math.random() * 10);
+
+        sprite.setScale(5);
+
+        sprite.addCollider();
+        sprite.drawCollider = 1;
+
+        sprite.onEvent("test_event", () => {
+            alert("test event ran!");
+        })
+
+        //make player follow mouse
+        sprite.addScript(new Script(() => {
+            if (engine.mouseDown) {
+                sprite.pos.x = engine.lerp(sprite.pos.x, engine.mousePos.x, 10);
+                sprite.pos.y = engine.lerp(sprite.pos.y, engine.mousePos.y, 10);
+                // sprite.pos.x = engine.mousePos.x;
+                // sprite.pos.y = engine.mousePos.y;
+            }
+
+            // sprite.pos.x += sprite.vel.x;
+            // sprite.pos.y += sprite.vel.y;
+
+            // if (sprite.pos.x - (sprite.w*sprite.scale)/2 < 0 || sprite.pos.x + (sprite.w*sprite.scale)/2 > engine.canvas.width) {
+            //     sprite.vel.x = -sprite.vel.x;
+            // }
+            // if (sprite.pos.y - (sprite.h*sprite.scale)/2 < 0 || sprite.pos.y + (sprite.h*sprite.scale)/2> engine.canvas.height) {
+            //     sprite.vel.y = -sprite.vel.y;
+            // }
+        }))
+
+        engine.addSprite(sprite);
+
+        //make ui element
+        let u = new UiElement(engine.canvas.width/2, engine.canvas.height/2, 512, 256);
+
+        //ui texture
+        let uTexture = new Image();
+        uTexture.src = "./uitest.png";
+        uTexture.onload = () => {
+            u.addTexture(uTexture);
+        }
+
+        u.addText("test_text", "Test Text", 10, 40, 100, 40, "#cfc", "Arial");
+
+        engine.addElement(u);
+
+        let timer = 0;
+
+        //main game loop
+        function loop() {
+            window.requestAnimationFrame(loop);
+            engine.loop();
+
+            timer++;
+
+            for (let i = 0; i < engine.interface.elements.length; i++) {
+                engine.interface.elements[i].changeText("test_text", timer);
+            }
+        }
+
+        //run game
+        loop();
+    </script>
 </body>
+
 </html>

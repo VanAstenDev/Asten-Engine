@@ -4,6 +4,8 @@ class Sprite {
         this.w = w;
         this.h = h;
 
+        this.active = 1;
+
         this.scripts = [];
 
         this.animated = 0;
@@ -12,6 +14,8 @@ class Sprite {
         this.drawCollider = 0;
 
         this.scale = 1;
+
+        this.events = [];
     }
 
     setTexture(image) {
@@ -26,6 +30,14 @@ class Sprite {
 
         this.totalFrames = this.texture.width / this.w;
         this.currentFrame = 0;
+    }
+
+    onEvent(identifier, func) {
+        let event = {
+            identifier: identifier,
+            func: func
+        }
+        this.events.push(event);
     }
 
     render(context) { //render
